@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+<div class="layer-control">
+                <input type="checkbox" id="check-renovaveis" checked onchange="event.stopPropagation(); toggleAllRenovaveis()">
+                <label for="check-renovaveis" style="display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;">
+                    <svg class="layer-icon" fill="none" stroke="#3b82f6" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3<!DOCTYPE html>
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
@@ -99,18 +104,10 @@
             transition: transform 0.3s ease;
         }
 
-        /* NO DESKTOP: SEMPRE VISÍVEL */
-        @media (min-width: 769px) {
-            .sidebar.mobile-hidden {
-                transform: translateX(0) !important; /* Força visibilidade no desktop */
-            }
-            
-            .menu-toggle {
-                display: none !important; /* Esconde botão menu no desktop */
-            }
+        .sidebar.mobile-hidden {
+            transform: translateX(calc(100% + 20px));
         }
 
-        /* NO MOBILE: INICIALMENTE ESCONDIDO */
         @media (max-width: 768px) {
             .menu-toggle {
                 display: block;
@@ -128,15 +125,10 @@
                 bottom: 0;
                 top: auto;
                 max-height: 80vh;
-                transform: translateY(100%); /* Inicialmente escondido no mobile */
             }
 
             .sidebar.mobile-hidden {
                 transform: translateY(100%);
-            }
-
-            .sidebar:not(.mobile-hidden) {
-                transform: translateY(0);
             }
 
             .header-title h1 {
@@ -230,7 +222,6 @@
             transition: background 0.2s;
             margin-bottom: 8px;
             user-select: none;
-            cursor: pointer;
         }
 
         .layer-control:hover {
@@ -242,7 +233,6 @@
             height: 18px;
             cursor: pointer;
             flex-shrink: 0;
-            margin: 0;
         }
 
         .layer-icon {
@@ -388,11 +378,10 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
             </svg>
             <div class="header-title">
-                <h1>WebSIG - Setor Energético</h1>
+                <h1>WebSIG - Energias em Portugal</h1>
                 <p>Portugal Continental</p>
             </div>
         </div>
-        <!-- Botão menu só visível no mobile -->
         <button class="menu-toggle" id="menu-toggle" onclick="toggleSidebar()">
             <svg id="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -407,23 +396,22 @@
 
     <div id="map"></div>
 
-    <!-- No desktop: sem a classe mobile-hidden por padrão -->
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar mobile-hidden" id="sidebar">
         <div class="sidebar-section">
             <div class="section-title">
                 <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"></path>
                 </svg>
-                Camadas
+                Layers
             </div>
-            <div class="layer-control" onclick="document.getElementById('check-renovaveis').click()">
+            <div class="layer-control">
                 <input type="checkbox" id="check-renovaveis" checked onchange="toggleAllRenovaveis()">
-                <label for="check-renovaveis">
+                <label for="check-renovaveis" style="display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;">
                     <svg class="layer-icon" fill="none" stroke="#3b82f6" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
-                    <span class="layer-label">Todas Energias Renováveis</span>
+                    <span class="layer-label">Ativar todas as layers</span>
                 </label>
             </div>
         </div>
@@ -435,58 +423,58 @@
                 </svg>
                 Tipos de Energia
             </div>
-            <div class="layer-control" onclick="document.getElementById('check-eolica').click()">
+            <div class="layer-control">
                 <input type="checkbox" id="check-eolica" checked onchange="toggleEnergyType('Eólica')">
-                <label for="check-eolica">
+                <label for="check-eolica" style="display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;">
                     <div style="width: 16px; height: 16px; border-radius: 50%; background: #3b82f6; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
                     <span class="layer-label" style="font-size: 13px;">Eólica</span>
                 </label>
             </div>
-            <div class="layer-control" onclick="document.getElementById('check-fotovoltaico').click()">
+            <div class="layer-control">
                 <input type="checkbox" id="check-fotovoltaico" checked onchange="toggleEnergyType('Fotovoltaico')">
-                <label for="check-fotovoltaico">
+                <label for="check-fotovoltaico" style="display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;">
                     <div style="width: 16px; height: 16px; border-radius: 50%; background: #f59e0b; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
                     <span class="layer-label" style="font-size: 13px;">Fotovoltaico</span>
                 </label>
             </div>
-            <div class="layer-control" onclick="document.getElementById('check-grandehidrica').click()">
+            <div class="layer-control">
                 <input type="checkbox" id="check-grandehidrica" checked onchange="toggleEnergyType('Grande Hídrica')">
-                <label for="check-grandehidrica">
+                <label for="check-grandehidrica" style="display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;">
                     <div style="width: 16px; height: 16px; border-radius: 50%; background: #0891b2; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
                     <span class="layer-label" style="font-size: 13px;">Grande Hídrica</span>
                 </label>
             </div>
-            <div class="layer-control" onclick="document.getElementById('check-pch').click()">
+            <div class="layer-control">
                 <input type="checkbox" id="check-pch" checked onchange="toggleEnergyType('PCH')">
-                <label for="check-pch">
+                <label for="check-pch" style="display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;">
                     <div style="width: 16px; height: 16px; border-radius: 50%; background: #22d3ee; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
                     <span class="layer-label" style="font-size: 13px;">PCH</span>
                 </label>
             </div>
-            <div class="layer-control" onclick="document.getElementById('check-biomassa').click()">
+            <div class="layer-control">
                 <input type="checkbox" id="check-biomassa" checked onchange="toggleEnergyType('Biomassa')">
-                <label for="check-biomassa">
+                <label for="check-biomassa" style="display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;">
                     <div style="width: 16px; height: 16px; border-radius: 50%; background: #16a34a; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
                     <span class="layer-label" style="font-size: 13px;">Biomassa</span>
                 </label>
             </div>
-            <div class="layer-control" onclick="document.getElementById('check-biogas').click()">
+            <div class="layer-control">
                 <input type="checkbox" id="check-biogas" checked onchange="toggleEnergyType('Biogás')">
-                <label for="check-biogas">
+                <label for="check-biogas" style="display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;">
                     <div style="width: 16px; height: 16px; border-radius: 50%; background: #84cc16; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
                     <span class="layer-label" style="font-size: 13px;">Biogás</span>
                 </label>
             </div>
-            <div class="layer-control" onclick="document.getElementById('check-rsu').click()">
+            <div class="layer-control">
                 <input type="checkbox" id="check-rsu" checked onchange="toggleEnergyType('RSU')">
-                <label for="check-rsu">
+                <label for="check-rsu" style="display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;">
                     <div style="width: 16px; height: 16px; border-radius: 50%; background: #dc2626; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
                     <span class="layer-label" style="font-size: 13px;">RSU</span>
                 </label>
             </div>
-            <div class="layer-control" onclick="document.getElementById('check-ondas').click()">
+            <div class="layer-control">
                 <input type="checkbox" id="check-ondas" checked onchange="toggleEnergyType('Ondas e Marés')">
-                <label for="check-ondas">
+                <label for="check-ondas" style="display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;">
                     <div style="width: 16px; height: 16px; border-radius: 50%; background: #8b5cf6; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.2);"></div>
                     <span class="layer-label" style="font-size: 13px;">Ondas e Marés</span>
                 </label>
@@ -757,20 +745,12 @@
         // Fechar sidebar ao clicar no mapa (mobile)
         function initMobileInteraction() {
             if (window.innerWidth <= 768) {
-                // No mobile, adiciona a classe mobile-hidden inicialmente
-                document.getElementById('sidebar').classList.add('mobile-hidden');
-                
                 map.on('click', function() {
                     const sidebar = document.getElementById('sidebar');
                     if (!sidebar.classList.contains('mobile-hidden')) {
                         toggleSidebar();
                     }
                 });
-            } else {
-                // No desktop, remove qualquer classe mobile-hidden
-                document.getElementById('sidebar').classList.remove('mobile-hidden');
-                // Esconde o botão menu no desktop
-                document.getElementById('menu-toggle').style.display = 'none';
             }
         }
 
@@ -780,12 +760,9 @@
             updateStatistics();
             loadRenovaveis();
             hideLoading();
-            initMobileInteraction(); // Configura comportamento mobile/desktop
+            initMobileInteraction();
             console.log('✅ WebSIG carregado!');
         });
-
-        // Reconfigura quando a janela é redimensionada
-        window.addEventListener('resize', initMobileInteraction);
     </script>
 </body>
 </html>
