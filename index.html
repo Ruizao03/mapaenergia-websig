@@ -99,10 +99,18 @@
             transition: transform 0.3s ease;
         }
 
-        .sidebar.mobile-hidden {
-            transform: translateX(calc(100% + 20px));
+        /* NO DESKTOP: SEMPRE VISÍVEL */
+        @media (min-width: 769px) {
+            .sidebar.mobile-hidden {
+                transform: translateX(0) !important; /* Força visibilidade no desktop */
+            }
+            
+            .menu-toggle {
+                display: none !important; /* Esconde botão menu no desktop */
+            }
         }
 
+        /* NO MOBILE: INICIALMENTE ESCONDIDO */
         @media (max-width: 768px) {
             .menu-toggle {
                 display: block;
@@ -120,10 +128,15 @@
                 bottom: 0;
                 top: auto;
                 max-height: 80vh;
+                transform: translateY(100%); /* Inicialmente escondido no mobile */
             }
 
             .sidebar.mobile-hidden {
                 transform: translateY(100%);
+            }
+
+            .sidebar:not(.mobile-hidden) {
+                transform: translateY(0);
             }
 
             .header-title h1 {
@@ -379,6 +392,7 @@
                 <p>Portugal Continental</p>
             </div>
         </div>
+        <!-- Botão menu só visível no mobile -->
         <button class="menu-toggle" id="menu-toggle" onclick="toggleSidebar()">
             <svg id="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -393,7 +407,8 @@
 
     <div id="map"></div>
 
-    <div class="sidebar mobile-hidden" id="sidebar">
+    <!-- No desktop: sem a classe mobile-hidden por padrão -->
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-section">
             <div class="section-title">
                 <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -742,12 +757,20 @@
         // Fechar sidebar ao clicar no mapa (mobile)
         function initMobileInteraction() {
             if (window.innerWidth <= 768) {
+                // No mobile, adiciona a classe mobile-hidden inicialmente
+                document.getElementById('sidebar').classList.add('mobile-hidden');
+                
                 map.on('click', function() {
                     const sidebar = document.getElementById('sidebar');
                     if (!sidebar.classList.contains('mobile-hidden')) {
                         toggleSidebar();
                     }
                 });
+            } else {
+                // No desktop, remove qualquer classe mobile-hidden
+                document.getElementById('sidebar').classList.remove('mobile-hidden');
+                // Esconde o botão menu no desktop
+                document.getElementById('menu-toggle').style.display = 'none';
             }
         }
 
@@ -757,9 +780,12 @@
             updateStatistics();
             loadRenovaveis();
             hideLoading();
-            initMobileInteraction();
+            initMobileInteraction(); // Configura comportamento mobile/desktop
             console.log('✅ WebSIG carregado!');
         });
+
+        // Reconfigura quando a janela é redimensionada
+        window.addEventListener('resize', initMobileInteraction);
     </script>
 </body>
 </html>
