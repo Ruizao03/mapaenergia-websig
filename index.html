@@ -283,6 +283,7 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.2);
             z-index: 2000;
             text-align: center;
+            display: none;
         }
 
         .loading-spinner {
@@ -391,7 +392,7 @@
 
     <div id="map"></div>
 
-    <div class="sidebar mobile-hidden" id="sidebar">
+    <div class="sidebar" id="sidebar">
         <div class="sidebar-section">
             <div class="section-title">
                 <svg class="section-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -505,6 +506,7 @@
         let map;
         let loadingElement = document.getElementById('loading');
         let energyLayers = {};
+        let isSidebarVisible = true; // Para controlar a visibilidade do sidebar
 
         const iconColors = {
             'Eólica': '#3b82f6',
@@ -555,6 +557,7 @@
 
         function loadRenovaveis() {
             console.log('🔍 Carregando renovaveis.json');
+            loadingElement.style.display = 'block';
             
             fetch('renovaveis.json')
                 .then(response => {
@@ -564,6 +567,7 @@
                 .then(data => {
                     console.log('✅ Dados carregados:', data.features.length, 'instalações');
                     createEnergyLayers(data);
+                    hideLoading();
                 })
                 .catch(err => {
                     console.error('❌ Erro ao carregar:', err);
@@ -617,8 +621,10 @@
                             
                             return marker;
                         }
-                    }).addTo(map);
+                    });
                     
+                    // Adiciona a layer ao mapa inicialmente
+                    layer.addTo(map);
                     energyLayers[energyType] = layer;
                     console.log(`✅ ${energyType}: ${filteredFeatures.length} instalações`);
                 }
@@ -709,8 +715,15 @@
                 'check-pch', 'check-biomassa', 'check-biogas', 'check-rsu', 'check-ondas'
             ];
             
-            const allChecked = energyCheckboxes.every(id => document.getElementById(id)?.checked);
-            const anyChecked = energyCheckboxes.some(id => document.getElementById(id)?.checked);
+            const allChecked = energyCheckboxes.every(id => {
+                const checkbox = document.getElementById(id);
+                return checkbox ? checkbox.checked : false;
+            });
+            
+            const anyChecked = energyCheckboxes.some(id => {
+                const checkbox = document.getElementById(id);
+                return checkbox ? checkbox.checked : false;
+            });
             
             const mainCheckbox = document.getElementById('check-renovaveis');
             mainCheckbox.checked = allChecked;
@@ -727,13 +740,26 @@
             const sidebar = document.getElementById('sidebar');
             const menuIcon = document.getElementById('menu-icon');
             
-            sidebar.classList.toggle('mobile-hidden');
+            isSidebarVisible = !isSidebarVisible;
             
-            // Mudar ícone
-            if (sidebar.classList.contains('mobile-hidden')) {
-                menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
+            if (window.innerWidth <= 768) {
+                // Para mobile: usa translateY
+                if (isSidebarVisible) {
+                    sidebar.classList.remove('mobile-hidden');
+                    menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+                } else {
+                    sidebar.classList.add('mobile-hidden');
+                    menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
+                }
             } else {
-                menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+                // Para desktop: usa translateX
+                if (isSidebarVisible) {
+                    sidebar.classList.remove('mobile-hidden');
+                    menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+                } else {
+                    sidebar.classList.add('mobile-hidden');
+                    menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
+                }
             }
         }
 
@@ -741,22 +767,44 @@
         function initMobileInteraction() {
             if (window.innerWidth <= 768) {
                 map.on('click', function() {
-                    const sidebar = document.getElementById('sidebar');
-                    if (!sidebar.classList.contains('mobile-hidden')) {
+                    if (isSidebarVisible) {
                         toggleSidebar();
                     }
                 });
             }
         }
 
+        // Prevenir que cliques no sidebar fechem-o
+        document.getElementById('sidebar').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
         window.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Iniciando WebSIG...');
             initMap();
             updateStatistics();
             loadRenovaveis();
-            hideLoading();
+            // Removido hideLoading() daqui porque agora é chamado após carregar os dados
             initMobileInteraction();
             console.log('✅ WebSIG carregado!');
+        });
+
+        // Atualizar visibilidade do sidebar ao redimensionar a janela
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('sidebar');
+            const menuIcon = document.getElementById('menu-icon');
+            
+            if (window.innerWidth <= 768) {
+                // Mobile: sidebar começa visível
+                sidebar.classList.remove('mobile-hidden');
+                isSidebarVisible = true;
+                menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+            } else {
+                // Desktop: sidebar começa visível
+                sidebar.classList.remove('mobile-hidden');
+                isSidebarVisible = true;
+                menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+            }
         });
     </script>
 </body>
