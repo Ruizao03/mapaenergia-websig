@@ -40,7 +40,6 @@
         }
 
         .menu-toggle {
-            display: none;
             background: none;
             border: none;
             color: white;
@@ -96,11 +95,15 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.15);
             z-index: 1000;
             overflow-y: auto;
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            opacity: 1;
+            transform: translateX(0);
         }
 
-        .sidebar.mobile-hidden {
+        .sidebar.hidden {
             transform: translateX(calc(100% + 20px));
+            opacity: 0;
+            pointer-events: none;
         }
 
         @media (max-width: 768px) {
@@ -120,9 +123,10 @@
                 bottom: 0;
                 top: auto;
                 max-height: 80vh;
+                transform: translateY(0);
             }
 
-            .sidebar.mobile-hidden {
+            .sidebar.hidden {
                 transform: translateY(100%);
             }
 
@@ -332,23 +336,6 @@
             color: #374151;
         }
 
-        @media (max-width: 768px) {
-            .sidebar {
-                width: calc(100% - 20px);
-                max-height: 40vh;
-                right: 10px;
-                left: 10px;
-            }
-
-            .header-title h1 {
-                font-size: 16px;
-            }
-
-            .header-title p {
-                font-size: 11px;
-            }
-        }
-
         .sidebar::-webkit-scrollbar {
             width: 6px;
         }
@@ -380,7 +367,7 @@
         </div>
         <button class="menu-toggle" id="menu-toggle" onclick="toggleSidebar()">
             <svg id="menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
         </button>
     </div>
@@ -400,6 +387,7 @@
                 </svg>
                 Layers
             </div>
+            
             <div class="layer-control">
                 <input type="checkbox" id="check-renovaveis" checked onchange="toggleAllRenovaveis()">
                 <label for="check-renovaveis" style="display: flex; align-items: center; gap: 12px; cursor: pointer; flex: 1;">
@@ -407,7 +395,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
-                    <span class="layer-label">Todas</span>
+                    <span class="layer-label">Ativar todas as energias</span>
                 </label>
             </div>
         </div>
@@ -506,7 +494,7 @@
         let map;
         let loadingElement = document.getElementById('loading');
         let energyLayers = {};
-        let isSidebarVisible = true; // Para controlar a visibilidade do sidebar
+        let isSidebarVisible = true;
 
         const iconColors = {
             'Eólica': '#3b82f6',
@@ -630,7 +618,7 @@
                 }
             });
             
-            console.log('✅ Layers criadas');
+            console.log('✅ Layers de energia criadas');
         }
 
         function updateStatistics() {
@@ -742,28 +730,21 @@
             
             isSidebarVisible = !isSidebarVisible;
             
-            if (window.innerWidth <= 768) {
-                // Para mobile: usa translateY
-                if (isSidebarVisible) {
-                    sidebar.classList.remove('mobile-hidden');
-                    menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
-                } else {
-                    sidebar.classList.add('mobile-hidden');
-                    menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
-                }
+            if (isSidebarVisible) {
+                sidebar.classList.remove('hidden');
+                menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
             } else {
-                // Para desktop: usa translateX
-                if (isSidebarVisible) {
-                    sidebar.classList.remove('mobile-hidden');
-                    menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
-                } else {
-                    sidebar.classList.add('mobile-hidden');
-                    menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
-                }
+                sidebar.classList.add('hidden');
+                menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
             }
         }
 
-        // Fechar sidebar ao clicar no mapa (mobile)
+        // Prevenir que cliques no sidebar fechem-no
+        document.getElementById('sidebar').addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+
+        // Fechar sidebar ao clicar no mapa (apenas mobile)
         function initMobileInteraction() {
             if (window.innerWidth <= 768) {
                 map.on('click', function() {
@@ -774,39 +755,31 @@
             }
         }
 
-        // Prevenir que cliques no sidebar fechem-o
-        document.getElementById('sidebar').addEventListener('click', function(e) {
-            e.stopPropagation();
-        });
-
         window.addEventListener('DOMContentLoaded', () => {
             console.log('🚀 Iniciando WebSIG...');
             initMap();
             updateStatistics();
             loadRenovaveis();
-            // Removido hideLoading() daqui porque agora é chamado após carregar os dados
             initMobileInteraction();
             console.log('✅ WebSIG carregado!');
+            
+            // Garantir que o sidebar está visível inicialmente
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.remove('hidden');
         });
 
         // Atualizar visibilidade do sidebar ao redimensionar a janela
         window.addEventListener('resize', function() {
-            const sidebar = document.getElementById('sidebar');
-            const menuIcon = document.getElementById('menu-icon');
-            
             if (window.innerWidth <= 768) {
-                // Mobile: sidebar começa visível
-                sidebar.classList.remove('mobile-hidden');
-                isSidebarVisible = true;
-                menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
-            } else {
-                // Desktop: sidebar começa visível
-                sidebar.classList.remove('mobile-hidden');
-                isSidebarVisible = true;
-                menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>';
+                // Para mobile
+                if (!isSidebarVisible) {
+                    const sidebar = document.getElementById('sidebar');
+                    const menuIcon = document.getElementById('menu-icon');
+                    sidebar.classList.add('hidden');
+                    menuIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>';
+                }
             }
         });
     </script>
 </body>
 </html>
-
